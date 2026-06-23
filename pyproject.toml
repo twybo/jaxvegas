@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jaxvegas"
+version = "0.1.0"
+description = "JAX implementation of the VEGAS+ adaptive Monte Carlo integrator"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "jax>=0.10.2",
+]
+
+[project.optional-dependencies]
+compare = [
+    "matplotlib>=3.11.0",
+    "torch>=2.12.1",
+    "torchquad>=0.5.0",
+    "vegas>=6.0",
+]
