@@ -9,16 +9,14 @@ reallocation of evaluations across hypercubes). The per-iteration kernel runs
 under `jax.jit`, so the integrand may itself be built from `jax.grad`,
 `jax.jit`, or `jax.vmap`.
 
+This was made by prompting Claude Opus 4.8 with the (vegas)[https://github.com/gplepage/vegas] repo and the arXiv TEX source.
+
 ## Installation
 
-```bash
-pip install jaxvegas
-```
-
-Or from source:
+From source:
 
 ```bash
-git clone https://github.com/your-org/jaxvegas
+git clone https://github.com/twybo/jaxvegas
 pip install ./jaxvegas
 ```
 
@@ -87,28 +85,28 @@ result = jaxvegas.integrate(lambda x: g(x[:, 0]), domain=[[0, 1]])
 
 ## `integrate` parameters
 
-| Parameter | Default | Description |
-|---|---|---|
-| `f` | — | Batched JAX integrand `(n, D) → (n,)` |
-| `domain` | — | `(D, 2)` list/array of `[a, b]` bounds per axis |
-| `neval` | `10000` | Target evaluations per iteration |
-| `nitn` | `10` | Number of accumulated iterations |
-| `nitn_warmup` | `10` | Discarded warmup iterations (grid adapts, results discarded) |
-| `alpha` | `0.5` | Grid adaptation rate (0 = no adaptation) |
-| `beta` | `0.75` | Stratification damping exponent |
-| `ninc` | `1000` | Grid increments per axis |
-| `nstrat` | `None` | Strata per axis; chosen automatically if `None` |
-| `seed` | `0` | PRNG seed |
+| Parameter     | Default | Description                                                  |
+| ------------- | ------- | ------------------------------------------------------------ |
+| `f`           | —       | Batched JAX integrand `(n, D) → (n,)`                        |
+| `domain`      | —       | `(D, 2)` list/array of `[a, b]` bounds per axis              |
+| `neval`       | `10000` | Target evaluations per iteration                             |
+| `nitn`        | `10`    | Number of accumulated iterations                             |
+| `nitn_warmup` | `10`    | Discarded warmup iterations (grid adapts, results discarded) |
+| `alpha`       | `0.5`   | Grid adaptation rate (0 = no adaptation)                     |
+| `beta`        | `0.75`  | Stratification damping exponent                              |
+| `ninc`        | `1000`  | Grid increments per axis                                     |
+| `nstrat`      | `None`  | Strata per axis; chosen automatically if `None`              |
+| `seed`        | `0`     | PRNG seed                                                    |
 
 ## `VegasResult` fields
 
-| Field | Description |
-|---|---|
-| `mean` | Inverse-variance weighted integral estimate |
-| `sdev` | Standard deviation of `mean` |
-| `chi2` | Chi-squared of the weighted average across iterations |
-| `dof` | Degrees of freedom (`nitn - 1`) |
-| `itn_results` | List of `(mean, sdev)` per accumulated iteration |
+| Field         | Description                                           |
+| ------------- | ----------------------------------------------------- |
+| `mean`        | Inverse-variance weighted integral estimate           |
+| `sdev`        | Standard deviation of `mean`                          |
+| `chi2`        | Chi-squared of the weighted average across iterations |
+| `dof`         | Degrees of freedom (`nitn - 1`)                       |
+| `itn_results` | List of `(mean, sdev)` per accumulated iteration      |
 
 A `chi2/dof` near 1 indicates consistent estimates across iterations.
 Values significantly above 1 suggest the integrand is still varying between
