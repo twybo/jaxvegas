@@ -30,7 +30,7 @@ jax.config.update("jax_enable_x64", True)
 TINY = 1e-30
 EPSILON = 1e-8
 
-__all__ = ["VegasResult", "integrate"]
+__all__ = ["VegasResult", "integrate", "report"]
 
 
 class VegasResult(NamedTuple):
@@ -50,6 +50,34 @@ class VegasResult(NamedTuple):
     chi2: float
     dof: int
     itn_results: list
+
+
+# --------------------------------------------------------------------------- #
+# Result reporting
+# --------------------------------------------------------------------------- #
+def report(result: VegasResult) -> None:
+    """Print a human-readable summary of a :class:`VegasResult`.
+
+    Shows the inverse-variance weighted mean ± sdev and the chi2/dof
+    goodness-of-fit statistic.  If *scipy* is available the p-value Q is also
+    shown.
+    """
+    dof = result.dof
+    chi2_dof = result.chi2 / dof if dof > 0 else float("nan")
+
+    q_str = ""
+    try:
+        from scipy.stats import chi2 as _chi2_dist  # soft dependency
+
+        if dof > 0:
+            q = float(_chi2_dist.sf(result.chi2, dof))
+            q_str = f"  Q = {q:.2f}"
+    except ImportError:
+        pass
+
+    print("VEGAS+ result:")
+    print(f"  mean     = {result.mean:.6g} ± {result.sdev:.2g}")
+    print(f"  chi2/dof = {chi2_dof:.2f}  (chi2={result.chi2:.2g}, dof={dof}){q_str}")
 
 
 # --------------------------------------------------------------------------- #
@@ -340,6 +368,7 @@ def integrate(
     nstrat: int | None = None,
     seed: int = 0,
     nitn_warmup: int = 10,
+    verbose: bool = False,
 ) -> VegasResult:
     """Integrate a pure batched JAX function with VEGAS+.
 
@@ -357,6 +386,8 @@ def integrate(
         seed: PRNG seed.
         nitn_warmup: number of discarded warmup iterations used to adapt the
             grid and stratification before accumulating results.
+        verbose: if ``True``, call :func:`report` on the result before
+            returning.
 
     Returns:
         a :class:`VegasResult`.
@@ -428,4 +459,7 @@ def integrate(
     chi2 = float((w * (means - mean) ** 2).sum())
     dof = max(nitn - 1, 0)
 
-    return VegasResult(mean=mean, sdev=sdev, chi2=chi2, dof=dof, itn_results=itn_results)
+    result = VegasResult(mean=mean, sdev=sdev, chi2=chi2, dof=dof, itn_results=itn_results)
+    if verbose:
+        report(result)
+    return result
