@@ -8,3 +8,5 @@ wheels/
 
 # Virtual environments
 .venv
+/arXiv-2009.05112v4
+/vegas
