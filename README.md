@@ -9,7 +9,7 @@ reallocation of evaluations across hypercubes). The per-iteration kernel runs
 under `jax.jit`, so the integrand may itself be built from `jax.grad`,
 `jax.jit`, or `jax.vmap`.
 
-This was made by prompting Claude Opus 4.8 with the (vegas)[https://github.com/gplepage/vegas] repo and the arXiv TEX source.
+This was made by prompting Claude Opus 4.8 with the [vegas](https://github.com/gplepage/vegas) repo and the arXiv TEX source.
 
 ## Installation
 
